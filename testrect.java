@@ -6,7 +6,7 @@ public class testrect{
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		rectangle p = new rectangle(); 
 		f.add(p); 
-		f.setSize(400,250); 
+		f.setSize(500,500); 
 		f.setVisible(true); 
 	}
 }
