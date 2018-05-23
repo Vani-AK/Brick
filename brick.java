@@ -3,17 +3,21 @@ import javax.swing.JPanel;
 import javax.swing.JButton;
 
 public class brick extends JFrame {
-	JFrame frame = new JFrame(); 
+	public static JFrame frame; 
+	public static game_boundaries boundaries ; 
+
 	
 	public static void main (String [] args){
-	new brick();	
-	}
+	JFrame frame = new JFrame("Arkanoid");
 	
-	public brick(){
-	super("Brick");
-	setSize(600,600);
-	setVisible(true);
-	setResizable(true);
+	frame.setSize(900,700);
+	frame.setLocationRelativeTo(null);
+		
+	boundaries = new game_boundaries();
+	boundaries.setSize(frame.getSize());	
+	frame.add(boundaries);
+	frame.setVisible(true);
+
 	
 		
 	}
