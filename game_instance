@@ -1,0 +1,36 @@
+import javax.swing.*; 
+import java.awt.*;
+
+public class game_instance extends JPanel{
+
+	private Dimension field = new Dimension(400,300);
+
+	public game_instance(){
+
+
+	}
+
+	public void set_size(Dimension a ){
+		super.setSize(a);
+		field = new Dimension(a.width-200, a.height-200);
+	}
+
+	public void paint (Graphics b ){
+		super.paint(b);
+		Graphics2D g2d = (Graphics2D) b;
+		g2d.translate((getWidth()-field.width)/2, (getHeight()-field.height)/2);
+		
+		g2d.setColor(Color.BLACK);
+		g2d.fillRect(0,0,field.width, field.height);
+		g2d.setColor(new Color (0,0,0));
+		g2d.fillRect(0,0,field.width, field.height);
+
+
+		
+		
+		
+	}	
+
+
+	
+}
