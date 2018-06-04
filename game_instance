@@ -1,36 +1,103 @@
-import javax.swing.*; 
 import java.awt.*;
+import javax.swing.*;
+import java.awt.event.*;
 
 public class game_instance extends JPanel{
-
 	private Dimension field = new Dimension(400,300);
-
-	public game_instance(){
-
-
-	}
-
-	public void set_size(Dimension a ){
-		super.setSize(a);
-		field = new Dimension(a.width-200, a.height-200);
-	}
-
-	public void paint (Graphics b ){
-		super.paint(b);
-		Graphics2D g2d = (Graphics2D) b;
-		g2d.translate((getWidth()-field.width)/2, (getHeight()-field.height)/2);
-		
-		g2d.setColor(Color.BLACK);
-		g2d.fillRect(0,0,field.width, field.height);
-		g2d.setColor(new Color (0,0,0));
-		g2d.fillRect(0,0,field.width, field.height);
-
-
-		
-		
-		
-	}	
-
+	private Paddle paddle;
+	private Ball ball; 
+	private boolean game_running = false; 
 
 	
+	public game_instance(Frame f) {
+		f.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e ) {
+				if (!game_running) {
+					if (e.getKeyCode()==KeyEvent.VK_ENTER) {
+						start_game();
+					}
+				}
+				if (e.getKeyCode()==KeyEvent.VK_LEFT && game_running == true) {
+					paddle.x_movement(-10);
+				}
+				else if (e.getKeyCode()==KeyEvent.VK_RIGHT && game_running == true) {
+					paddle.x_movement(10);
+				}
+			
+			}
+		});
+		
+		paddle = new Paddle(this, (int)((field.getWidth()-Paddle.paddle_width)), (int)field.getHeight()-Paddle.paddle_height, Paddle.paddle_width, Paddle.paddle_height);
+		ball = new Ball(this, field.width/2, field.height/2, 8);
+	}
+	
+
+	
+	public void setPaddle(Paddle paddle) {
+		this.paddle = paddle;
+		
+	}
+	
+	public Paddle getPaddle() {
+		return(this.paddle);
+	}
+	
+	public void start_game () {
+		game_thread.start();
+	}
+	
+	public void temp_stop () {
+		game_thread.stop();
+	}
+	
+	public void stop_game() {
+		game_running = false; 
+	}
+	public Dimension get_dimensions() {
+		return(field);
+	}
+	
+	
+	public void setSize(Dimension d) {
+		
+		super.setSize(d);
+		if (game_running == false) {
+		field = new Dimension (d.width-200,d.height-200 );
+		ball.center_ball(field.width/2, field.height/2);
+		//paddle.setY(field.height- Paddle.paddle_height);
+		
+		paddle.setY(425);
+	}
+	}
+	
+	private Thread game_thread = new Thread(new Runnable() {
+		public void run() {
+			game_running = true;
+			ball.set_trajectory(10, 10);
+			while (game_running == true) {
+				ball.movement();
+				repaint();
+				try {
+					Thread.sleep(70);
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+	});
+	
+	public void paint (Graphics g) {
+		super.paint(g);
+		
+		g.translate((getWidth()-field.width)/2, (getHeight()- field.height)/2);
+		g.setColor(new Color(0,0,0));
+		g.fillRect(0, 0, field.width, field.height);
+		
+		paddle.create_graphics(g);
+		
+		g.setColor(new Color(0,0,0));
+		g.drawRect(0,0, field.width, field.height);
+		
+		ball.paint(g);
+		
+	}
 }
