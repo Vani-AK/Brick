@@ -1,0 +1,12 @@
+import java.awt.*;
+
+public class Blocks {
+	private Rectangle brick; 
+	
+	public Blocks(int x, int y, int width, int height) {
+		brick = new Rectange (x,y,width, height);
+	}
+	public void create_graphic (Graphics g ) {
+		
+	}
+}
