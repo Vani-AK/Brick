@@ -136,7 +136,7 @@ public class Game extends JPanel{
 				
 				repaint();
 				try {
-					Thread.sleep(50);
+					Thread.sleep(30);
 				} catch (Exception e) {
 				}
 				}
