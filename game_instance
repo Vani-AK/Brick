@@ -2,36 +2,69 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 
-public class game_instance extends JPanel{
+public class Game extends JPanel{
 	private Dimension field = new Dimension(400,300);
 	private Paddle paddle;
+	private Blocks [][] blocks;
 	private Ball ball; 
 	private boolean game_running = false; 
+	private boolean game_paused = false;
+	private boolean is_won=false;
+	private boolean is_lost = false; 
+	private int ball_counter;
 
 	
-	public game_instance(Frame f) {
+	public Game(Frame f, int x_axis_bricks, int y_axis_bricks) {
 		f.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e ) {
-				if (!game_running) {
+				if(is_won || is_lost){
+					if (e.getKeyCode() == KeyEvent.VK_ENTER){
+						System.exit(0);
+					}
+				}
+				else if (!game_running  || game_paused) {
 					if (e.getKeyCode()==KeyEvent.VK_ENTER) {
 						start_game();
 					}
 				}
-				if (e.getKeyCode()==KeyEvent.VK_LEFT && game_running == true) {
-					paddle.x_movement(-10);
+				else {
+					if (e.getKeyCode()==KeyEvent.VK_LEFT && game_running == true) {
+					paddle.x_movement(-20);
 				}
 				else if (e.getKeyCode()==KeyEvent.VK_RIGHT && game_running == true) {
-					paddle.x_movement(10);
-				}
+					paddle.x_movement(20);
+				}}
+				
 			
 			}
 		});
-		
+		blocks = new Blocks[x_axis_bricks][y_axis_bricks];
+		for (int i=0; i<blocks.length; i++) {
+			for (int j=0; j<blocks[0].length; j++) {
+				int width = field.width/x_axis_bricks;
+				int height = (field.height/4) / y_axis_bricks;
+				blocks[i][j] = new Blocks(i*width, j*height, width, height);
+			}
+			
+		}
 		paddle = new Paddle(this, (int)((field.getWidth()-Paddle.paddle_width)), (int)field.getHeight()-Paddle.paddle_height, Paddle.paddle_width, Paddle.paddle_height);
-		ball = new Ball(this, field.width/2, field.height/2, 8);
+		ball = new Ball(this, field.width/2, field.height/2, 6);
+		ball_counter= 1; 
 	}
 	
+	public void ball_gone() {
+		temp_stop();
+		ball_counter = ball_counter-1;
+		if (ball_counter<=0){
+			is_lost = true;
+		}
 
+		ball.set_trajectory(10,10);
+		ball.center_ball(field.width/2, field.height/2);
+		paddle.setY(425);
+		repaint();
+		
+	}
 	
 	public void setPaddle(Paddle paddle) {
 		this.paddle = paddle;
@@ -41,18 +74,31 @@ public class game_instance extends JPanel{
 	public Paddle getPaddle() {
 		return(this.paddle);
 	}
-	
+	public Blocks[][] getBlocks(){
+		return(this.blocks);
+	}
+
+	public void player_wins(){
+		is_won = true;
+
+	}
 	public void start_game () {
+		game_paused = false;
+		if (!game_running)
 		game_thread.start();
 	}
 	
 	public void temp_stop () {
-		game_thread.stop();
+		game_paused = true;
+	
 	}
 	
 	public void stop_game() {
 		game_running = false; 
 	}
+	
+	
+	
 	public Dimension get_dimensions() {
 		return(field);
 	}
@@ -61,8 +107,16 @@ public class game_instance extends JPanel{
 	public void setSize(Dimension d) {
 		
 		super.setSize(d);
-		if (game_running == false) {
+		if (!game_running ) {
 		field = new Dimension (d.width-200,d.height-200 );
+		for (int i=0; i<blocks.length; i++) {
+			for (int j=0; j<blocks[0].length; j++) {
+				int width = field.width/blocks.length;
+				int height = (field.height/3) / blocks[0].length;
+				blocks[i][j] = new Blocks(i*width, j*height, width, height);
+			}
+			
+		}
 		ball.center_ball(field.width/2, field.height/2);
 		//paddle.setY(field.height- Paddle.paddle_height);
 		
@@ -74,30 +128,70 @@ public class game_instance extends JPanel{
 		public void run() {
 			game_running = true;
 			ball.set_trajectory(10, 10);
-			while (game_running == true) {
+			while (game_running) {
+				if (!game_paused) {
+
 				ball.movement();
+
+				
 				repaint();
 				try {
-					Thread.sleep(70);
-				} catch (InterruptedException e) {
+					Thread.sleep(50);
+				} catch (Exception e) {
+				}
 				}
 			}
 		}
 	});
 	
+	
+	
 	public void paint (Graphics g) {
 		super.paint(g);
 		
 		g.translate((getWidth()-field.width)/2, (getHeight()- field.height)/2);
+
+		g.setColor(new Color(255,0,0));
+		int radius = 4;
+		// for (int i=0; i<ball_counter; i++){
+		// 	g.fillOval(i*radius*2, -(radius*2+4), radius*2, radius*2);
+
+		// }
+		
 		g.setColor(new Color(0,0,0));
 		g.fillRect(0, 0, field.width, field.height);
 		
 		paddle.create_graphics(g);
+
+		ball.paint(g);
 		
+		for (Blocks[] b1: blocks ) {
+			for (Blocks b2: b1) {
+				b2.create_graphic(g);
+				
+			}
+		}
 		g.setColor(new Color(0,0,0));
 		g.drawRect(0,0, field.width, field.height);
 		
-		ball.paint(g);
+		if (is_won){
+			
+			g.setColor(new Color(255, 255,255 ));	
+			g.fillRect(300, 250, 120, 80);
+			g.setColor(new Color(0,0,0));
+			g.drawString("You win", 325, 280);
+			stop_game();
+		}
+		if (is_lost==true){
+			g.setColor(new Color(255, 255,255 ));	
+			g.fillRect(300, 250, 120, 80);
+			g.setColor(new Color(0,0,0));
+			g.drawString("You lose", 325, 280);
+			stop_game();
+
+
+		}
 		
 	}
+	
 }
