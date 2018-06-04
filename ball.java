@@ -1,74 +1,53 @@
-import javax.swing.JFrame;
+import java.awt.Graphics;
 import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*; 
-import java.util.Formatter;
 
-public class ball extends JPanel{
-	private static final int width = 640;
-	private static final int height = 480; 
-
-	private float radius = 10; 
-	private float x = radius +50; 
-	private float y = radius +20;
-	private float speedx = 3;
-	private float speedy = 2; 
-
-	private static final int update = 30; 
-
-	public void bouncing(){
-		this.setPreferredSize(new Dimension(width, height)); 
-
-		Thread gameThread = new Thread(){
-			public void run (){
-				while(true){
-					x += speedx;
-					y += speedy;
-					if(x - radius < 0){
-						speedx = -speedx;
-						x = width - radius; 
-					} else if (x + radius > width){
-						speedx = -speedx; 
-						x = width - radius; 
-					}
-					if(y - radius < 0){
-						speedy = -speedy;
-						y = radius; 
-					} else if(y + radius > height){
-						speedy = -speedy; 
-						y = height - radius; 
-					}
-					repaint();
-					try{
-						Thread.sleep(1000/update);
-					}catch(InterruptedException ex) {}
-				}
-			}
-		};
-		gameThread.start(); 
+public class Ball {
+	private int radius; 
+	private Game game_instance;
+	private Dimension trajectory = new Dimension (0,0);
+	private Point coordinate = new Point (0,0);
+	
+	private Point coord = new Point (0,0);
+	
+	public Ball(Game instance, int x, int y, int radius) {
+		game_instance = instance; 
+		coordinate = new Point (x,y);
+		this.radius = radius;
+	}
+	
+	public void set_trajectory (int x_movement, int y_movement) {
+		trajectory = new Dimension(x_movement, y_movement);
+	}
+	
+	public Point get_coord() {
+		return coordinate;
+	}
+	
+	public void center_ball(int x, int y) {
+		coordinate = new Point (x,y);
+	}
+	
+	public void movement () {
+		if (coordinate.x-radius <=0 && trajectory.width<0) {
+			trajectory.width = -trajectory.width;
+		}
+		if (coordinate.x-radius <=0 && trajectory.width<0) {
+			trajectory.width = -trajectory.width;
+		}
+		if (coordinate.y-radius <=0 && trajectory.width<0) {
+			trajectory.width = -trajectory.width;
+		}
+		if (coordinate.y-radius <=0 && trajectory.width<0) {
+			trajectory.width = -trajectory.width;
+		}
+		coordinate.move(coordinate.x + trajectory.width, coordinate.y +trajectory.height);
+	}
+	
+	
+	public void paint(Graphics g){
+		
+		g.setColor(new Color(51,204,255));
+		g.fillOval((int) (coordinate.x - radius), (int) (coordinate.y - radius),(int)(2 * radius), (int)(2 * radius));
 	}
 
-	public void paintComponent(Graphics g){
-		super.paintComponent(g);
-
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, width, height);
-
-		 g.setColor(Color.BLUE);
-     	 g.fillOval((int) (x - radius), (int) (y - radius),
-            (int)(2 * radius), (int)(2 * radius));
-	}
-	 public static void main(String[] args) {
-      // Run GUI in the Event Dispatcher Thread (EDT) instead of main thread.
-      javax.swing.SwingUtilities.invokeLater(new Runnable() {
-         public void run() {
-            // Set up main window (using Swing's Jframe)
-            JFrame frame = new JFrame("A Bouncing Ball");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setContentPane(new ball());
-            frame.pack();
-            frame.setVisible(true);
-         }
-      });
-   }
 }

@@ -1,0 +1,34 @@
+import java.awt.*;
+
+public class Paddle {
+	public static int paddle_width = 80; 
+	public static int paddle_height = 10;	
+	Rectangle box = new Rectangle (0,0,100,30);
+	private Game game_instance;
+	
+	public Paddle(Game instance, int x_var, int y_var, int width, int height) {
+		game_instance = instance; 
+		box = new Rectangle(x_var, y_var, width, height);
+	}
+	
+	public void x_movement(int speed) {
+		box.x = box.x + speed; 
+		if (box.x <0)
+			box.x = 0;
+		else if (box.x >game_instance.get_dimensions().width-game_instance.getPaddle().box.width) {
+			box.x = game_instance.get_dimensions().width-game_instance.getPaddle().box.width;
+		}
+		
+	}
+	
+	
+	public void setY(int y ) {
+		box.y = y ;
+	}
+		
+	public void create_graphics (Graphics g ) {
+		g.setColor(new Color(255,255,255));
+		g.fillRect(box.x, box.y, box.width, box.height);
+	}
+	
+}
